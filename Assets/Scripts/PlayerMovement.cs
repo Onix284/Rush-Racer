@@ -11,12 +11,13 @@ public class PlayerMovement : MonoBehaviour
     public Transform spwanPoint;
     public GameObject bulletPrefab;
     public float bulletForce = 5f;
-    public float fireRate = 0.5f; 
+    public float fireRate = 0.5f;
     private float nextFireTime = 0f;
     public bool isFiring = false;
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("test commit");
         Debug.Log("Start method called");
         fireButton.onClick.RemoveAllListeners();
         fireButton.onClick.AddListener(handleFireTouch);
@@ -48,23 +49,29 @@ public class PlayerMovement : MonoBehaviour
     void handleFireTouch()
     {
         if (Time.time >= nextFireTime)
-            {
-                fireMechanism();
-                nextFireTime = Time.time + fireRate; // Update the next fire time
-            }
+        {
+            fireMechanism();
+            nextFireTime = Time.time + fireRate; // Update the next fire time
+        }
     }
 
     void fireMechanism()
     {
 
-            Debug.Log("Fire Button Clicked!");
-            GameObject bullet = Instantiate(bulletPrefab, spwanPoint.position, spwanPoint.rotation);
+        Debug.Log("Fire Button Clicked!");
+        GameObject bullet = Instantiate(bulletPrefab, spwanPoint.position, spwanPoint.rotation);
 
-            Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
+        Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
 
-            if (bulletRb != null)
-            {
-                bulletRb.AddForce(spwanPoint.forward * bulletForce, ForceMode.Impulse);
-            }
+        if (bulletRb != null)
+        {
+            bulletRb.AddForce(spwanPoint.forward * bulletForce, ForceMode.Impulse);
+        }
+
     }
+
+  
 }
+
+
+
