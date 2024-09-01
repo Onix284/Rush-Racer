@@ -12,22 +12,25 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed;
     public Joystick Movejoystick;
     public Button fireButton;
+    public float rotationSpeed = 360f; // Degrees per second
+
     public Transform spwanPoint;
     public GameObject bulletPrefab;
     public float bulletForce = 5f;
     public float fireRate = 0.5f;
     private float nextFireTime = 0f;
     public bool isFiring = false;
+
     public bool playerIsDead = false;
     public int playerHealth = 25;
-    public float rotationSpeed = 360f; // Degrees per second
-    public GameObject targetObject;
+
     public ParticleSystem deathParticle;
     public ParticleSystem fireParticle;
+
+
     public void Start()
     {
         fireButton.onClick.AddListener(handleFire);
-        
     }
 
     public void Update()
@@ -127,6 +130,7 @@ public class PlayerMovement : MonoBehaviour
         StartCoroutine(restartLevel());
         
     }
+
 
     IEnumerator restartLevel()
     {
