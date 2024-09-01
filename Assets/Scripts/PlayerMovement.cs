@@ -1,7 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -14,64 +18,121 @@ public class PlayerMovement : MonoBehaviour
     public float fireRate = 0.5f;
     private float nextFireTime = 0f;
     public bool isFiring = false;
-    // Start is called before the first frame update
-    void Start()
+    public bool playerIsDead = false;
+    public int playerHealth = 25;
+    public float rotationSpeed = 360f; // Degrees per second
+    public GameObject targetObject;
+    public ParticleSystem deathParticle;
+    public ParticleSystem fireParticle;
+    public void Start()
     {
-        Debug.Log("test commit");
-        Debug.Log("Start method called");
-        fireButton.onClick.RemoveAllListeners();
-        fireButton.onClick.AddListener(handleFireTouch);
+        fireButton.onClick.AddListener(handleFire);
+        
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Update()
     {
-
-        movementInput();
-    }
-
-    void movementInput()
-    {
-        float horizontalMovement = Movejoystick.Horizontal;
-        float verticalMovement = Movejoystick.Vertical;
-
-        Vector3 movemnt = new Vector3(horizontalMovement, 0, verticalMovement).normalized;
-
-        transform.Translate(movemnt * moveSpeed * Time.deltaTime, Space.World);
-
-        if (movemnt != Vector3.zero)
+        if (playerHealth < 0) 
         {
-            Quaternion rotation = Quaternion.LookRotation(movemnt, Vector3.up);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, 360 * Time.deltaTime);
+            if(!playerIsDead)
+            {
+                Debug.Log("player is dead");
+                playerIsDead = true;
+                Die();
+            }
+          
+        }
+
+        if(!playerIsDead)
+        {
+            movementInput();
+            handleFire();
         }
     }
 
-    void handleFireTouch()
+
+    public void movementInput()
     {
-        if (Time.time >= nextFireTime)
+      
+        float horizontalMovement = Movejoystick.Horizontal;
+        float verticalMovement = Movejoystick.Vertical;
+
+        if (horizontalMovement != 0)
+        {
+            Quaternion targetRotation = Quaternion.Euler(0, horizontalMovement * rotationSpeed * Time.deltaTime, 0);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation * transform.rotation, rotationSpeed * Time.deltaTime);
+        }
+
+        if (verticalMovement != 0)
+        {
+            Vector3 movement = transform.forward * verticalMovement * moveSpeed * Time.deltaTime;
+            transform.Translate(movement, Space.World);
+        }
+
+    }
+
+    public void startFire()
+    {
+        isFiring = true;
+    }
+
+    public void stopFire()
+    {
+        isFiring = false;
+    }
+
+
+    public void handleFire()
+    {
+        if (isFiring && Time.time >= nextFireTime)
         {
             fireMechanism();
             nextFireTime = Time.time + fireRate; // Update the next fire time
         }
     }
-
-    void fireMechanism()
+    public void fireMechanism()
     {
-
-        Debug.Log("Fire Button Clicked!");
         GameObject bullet = Instantiate(bulletPrefab, spwanPoint.position, spwanPoint.rotation);
 
         Rigidbody bulletRb = bullet.GetComponent<Rigidbody>();
 
         if (bulletRb != null)
         {
+            fireParticle.Play();
             bulletRb.AddForce(spwanPoint.forward * bulletForce, ForceMode.Impulse);
         }
 
     }
 
-  
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("enemyBullet"))
+        {
+            playerHealth -= 5;
+            Destroy(collision.gameObject);
+        }
+    }
+
+    private void Die()
+    {
+        if (deathParticle != null)
+        {
+            ParticleSystem deathEffect = Instantiate(deathParticle, transform.position, Quaternion.identity);
+            deathEffect.Play();
+
+            Destroy(deathEffect.gameObject, deathEffect.main.duration);
+        }
+
+
+        StartCoroutine(restartLevel());
+        
+    }
+
+    IEnumerator restartLevel()
+    {
+        Debug.Log("Waiting for 10 seconds");
+        yield return new WaitForSeconds(8f);
+        SceneManager.LoadScene("GameScene");
+    }
 }
-
-
 
