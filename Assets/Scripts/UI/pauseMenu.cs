@@ -20,6 +20,8 @@ public class pauseMenu : MonoBehaviour
     public Sprite musicOffSprite;
     public Image musicIconImage;
 
+
+    public AudioSource backgroundAudio;
     public bool isSoundPlaying = true;
     // Start is called before the first frame update
     void Start()
@@ -35,16 +37,14 @@ public class pauseMenu : MonoBehaviour
         mainCanvas.gameObject.SetActive(true);
         pauseCamera.SetActive(false);
 
+
         UpdateMusicState();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isSoundPlaying) 
-        {
-           
-        }
+
     }
 
     void pausMenu()
@@ -95,21 +95,21 @@ public class pauseMenu : MonoBehaviour
 
     private void UpdateMusicState()
     {
-        //if (backgroundMusic != null)
-        //{
+        if (backgroundAudio != null)
+        {
             if (isSoundPlaying)
             {
-            //backgroundMusic.Play();
-                
                 musicIconImage.sprite = musicOnSprite;
-                Debug.Log("Music is playing");  
+                Debug.Log("Music is playing");
+                backgroundAudio.Play();
             }
             else
             {
-            //backgroundMusic.Stop();
                 musicIconImage.sprite = musicOffSprite;
-            Debug.Log("Music is stopped");
+                Debug.Log("Music is stopped");
+                backgroundAudio.Pause();
             }
+        }
       }
 
     void quitGame()

@@ -9,10 +9,10 @@ public class enemyMovement : MonoBehaviour
     public Transform player;
 
     public GameObject bulletPrefab;
-    public float fireRange = 20f;
-    public float fireRate = 2f;
+    public float fireRange = 15f;
+    public float fireRate = 0.75f;
     public Transform firePoint;
-    public float bulletforce = 30f;
+    public float bulletforce = 20f;
 
     private NavMeshAgent agent;
     private float fireTimer;
