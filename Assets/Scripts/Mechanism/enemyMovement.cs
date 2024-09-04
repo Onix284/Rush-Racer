@@ -22,6 +22,8 @@ public class enemyMovement : MonoBehaviour
 
     public ParticleSystem hitParticle;
     public ParticleSystem deathParticle;
+
+    public EnemySoundManager soundManager;
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -54,6 +56,7 @@ public class enemyMovement : MonoBehaviour
         if (fireTimer >= fireRate && IsPlayerInSight())
         {
             FireBullet();
+            soundManager.fire();
             fireTimer = 0f;
         }
     }
@@ -71,7 +74,7 @@ public class enemyMovement : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit, fireRange))
             {
-                if (hit.transform == player)
+                if (hit.transform.tag == "player")
                 {
                     return true;
                 }
@@ -106,6 +109,7 @@ public class enemyMovement : MonoBehaviour
         {
             enemyHealth -= 5;
             hitParticle.Play();
+            soundManager.death();
             Destroy(collision.gameObject);
             Debug.Log("Enemy health : " + enemyHealth);
         }

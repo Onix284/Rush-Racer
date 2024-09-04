@@ -22,6 +22,11 @@ public class playerBulletController : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+
+        if(collision.gameObject.CompareTag("heal"))
+        {
+            Destroy(this.gameObject);
+        }
     }
 
     

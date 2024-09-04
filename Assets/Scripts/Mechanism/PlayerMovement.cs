@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
           
         }
 
-        if(!playerIsDead)
+       else
         {
             movementInput();
             handleFire();
@@ -68,14 +68,14 @@ public class PlayerMovement : MonoBehaviour
 
         bool isMoving = horizontalMovement != 0 || verticalMovement != 0;
 
-        if (isMoving)
+        if (isMoving && !playerIsDead)
         {
 
-           // playerSounds.movement();
+           playerSounds.movement();
         }
         else
         {
-            // playerSounds.StopMovementSound();
+           playerSounds.StopMovementSound();
         }
 
         if (horizontalMovement != 0)
@@ -86,10 +86,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (verticalMovement != 0)
         {
-            playerSounds.movement();
             Vector3 movement = transform.forward * verticalMovement * moveSpeed * Time.deltaTime;
             transform.Translate(movement, Space.World);
-    
         }
 
     }
@@ -124,7 +122,6 @@ public class PlayerMovement : MonoBehaviour
         {
             fireParticle.Play();
             bulletRb.AddForce(spwanPoint.forward * bulletForce, ForceMode.Impulse);
-            //playerSounds.fire();
         }
 
     }
@@ -135,6 +132,14 @@ public class PlayerMovement : MonoBehaviour
         {
             playerHealth -= 5;
             healthBar.fillAmount = Mathf.Clamp01(playerHealth / maxHealth);
+            Destroy(collision.gameObject);
+        }
+
+        if (collision.gameObject.CompareTag("heal"))
+        {
+            playerHealth += 7;
+            healthBar.fillAmount = Mathf.Clamp01(playerHealth / maxHealth);
+            StartCoroutine(destroyHealthSystem());
             Destroy(collision.gameObject);
         }
     }
@@ -150,7 +155,7 @@ public class PlayerMovement : MonoBehaviour
             Destroy(deathEffect.gameObject, deathEffect.main.duration);
         }
 
-
+        playerSounds.StopMovementSound();
         StartCoroutine(restartLevel());
     }
 
@@ -160,7 +165,14 @@ public class PlayerMovement : MonoBehaviour
     {
         Debug.Log("Waiting for 10 seconds");
         yield return new WaitForSeconds(8f);
-        SceneManager.LoadScene("GameScene");
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.name);
+    }
+
+    IEnumerator destroyHealthSystem()
+    {
+        yield return new WaitForSeconds(5f);
+        Debug.Log("Destroying health system");
     }
 }
 

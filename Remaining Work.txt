@@ -1,0 +1,6 @@
+03/09/2024
+Bug:
+Player movement sound after death
+Remaining:
+1. Enemy Sound
+2. Click Sound
