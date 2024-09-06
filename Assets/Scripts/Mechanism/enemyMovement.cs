@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class enemyMovement : MonoBehaviour
 {
-    public int enemyHealth = 20;
+    public int enemyHealth = 25;
     public Transform player;
 
     public GameObject bulletPrefab;
@@ -19,6 +19,7 @@ public class enemyMovement : MonoBehaviour
 
     private PlayerMovement pm;
     private bool isFiring = true;
+    private bool isDead = false;
 
     public ParticleSystem hitParticle;
     public ParticleSystem deathParticle;
@@ -40,10 +41,14 @@ public class enemyMovement : MonoBehaviour
             return;
         }
 
+        if (isDead)
+        {
+            return;
+        }
+
         if (enemyHealth <= 0)
         {
-            agent.velocity = Vector3.zero;
-            StartCoroutine(enemyDeath());
+            Die();
             return;
         }
 
@@ -99,7 +104,7 @@ public class enemyMovement : MonoBehaviour
 
     private void StopFiring()
     {
-        isFiring = false; // Disable firing
+        isFiring = false;
     }
 
 
@@ -111,16 +116,34 @@ public class enemyMovement : MonoBehaviour
             hitParticle.Play();
             soundManager.death();
             Destroy(collision.gameObject);
-            Debug.Log("Enemy health : " + enemyHealth);
+
+
+            if(enemyHealth <= 0)
+            {
+                Die();
+            }
         }
     }
 
 
-    IEnumerator enemyDeath()
+    private void Die()
     {
-        deathParticle.Play();
-        yield return new WaitForSeconds(deathParticle.main.duration);
-        //Destroy(gameObject);
+        if(isDead) return;
+
+        isDead = true;
+
+        if(deathParticle != null)
+        {
+            deathParticle.Play();
+        }
+
+        GetComponent<Collider>().enabled = false;
+        GetComponent<NavMeshAgent>().enabled = false;
+
+        EnemyManager.Instance.EnemyKilled();
+
+        float deathDuration = deathParticle != null ? deathParticle.duration : 0f;
+        Destroy(gameObject, deathDuration);
     }
 }
 

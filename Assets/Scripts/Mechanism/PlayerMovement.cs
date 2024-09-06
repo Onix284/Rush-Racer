@@ -137,7 +137,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (collision.gameObject.CompareTag("heal"))
         {
-            playerHealth += 7;
+            playerHealth += 10f;
             healthBar.fillAmount = Mathf.Clamp01(playerHealth / maxHealth);
             StartCoroutine(destroyHealthSystem());
             Destroy(collision.gameObject);
